@@ -6,14 +6,20 @@ import edu.caelum.estudos.java8napratica.model.DataPreLoaded;
 import edu.caelum.estudos.java8napratica.model.User;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Testes {
 
     @Test
     public void loadListOldScenario(){
-        for (User u: DataPreLoaded.users.stream().collect(Collectors.toList()))
+        for (User u: getUsers().stream().collect(Collectors.toList()))
             System.out.println(u);
     }
 
@@ -21,10 +27,9 @@ public class Testes {
     public void testForEach(){
 
         Mostrador mostrador = new Mostrador();
-        DataPreLoaded.users.stream().forEach(mostrador);
+        getUsers().stream().forEach(mostrador);
 
-        System.out.println(">>>>>>>>>> Segunda forma");
-        DataPreLoaded.users.stream().forEach(new Consumer<User>() {
+        getUsers().stream().forEach(new Consumer<User>() {
             @Override
             public void accept(User user) {
                 System.out.println(user.getNome());
@@ -34,10 +39,7 @@ public class Testes {
 
     @Test
     public void testSimpleLambda(){
-        System.out.println(">>>>>>>>>> Inclusao do lambda");
-        DataPreLoaded.users.stream().forEach(u -> System.out.println(u.getNome()));
-
-        System.out.println(">>>>>>>>>> lambdas em threads - Interface funcional Runnable");
+        getUsers().stream().forEach(u -> System.out.println(u.getNome()));
 
         new Thread(() -> {for (int i = 0; i < 10; i++){System.out.println(i);}}).start();
     }
@@ -61,13 +63,105 @@ public class Testes {
 
     @Test
     public void testConsumer() {
-        System.out.println(">>>>>>>>>> Testando consumers");
-
         Consumer<User> mostraSufixo = c -> System.out.println("Testando o lambda");
 
         Consumer<User> mostraNome = c -> System.out.println(c.getNome());
 
-        DataPreLoaded.users.stream().forEach(mostraSufixo.andThen(mostraNome));
+        getUsers().stream().forEach(mostraSufixo.andThen(mostraNome));
+    }
+
+
+    @Test
+    public void testRemoveIf(){
+        List<User> users = getUsers();
+        Predicate<User> predicate = u -> u.getNome().length() < 5;
+        users.removeIf(predicate);
+        users.forEach(user -> System.out.println(user));
+    }
+
+    @Test
+    public void orderingList(){
+        getUsers()
+                .stream()
+                .sorted((o1, o2) -> o1.getPontos().compareTo(o2.getPontos()))
+                .forEach(System.out::println);
+    }
+
+    @Test
+    public void orderingListUsingComparing(){
+
+        /**
+         * First case
+         */
+        Function<User, String> getNome = user -> user.getNome();
+        getUsers().stream()
+                .sorted(Comparator.comparing(getNome))
+                .forEach(System.out::println);
+
+        /**
+         * Reduced case
+         */
+        Function<User, String> getNomeReduced = User::getNome;
+        getUsers().stream()
+                .sorted(Comparator.comparing(getNomeReduced))
+                .forEach(System.out::println);
+
+
+        /**
+         * Legible case
+         */
+        getUsers().stream()
+                .sorted(Comparator.comparing(User::getNome))
+                .forEach(System.out::println);
+    }
+
+    @Test
+    public void changeAllToModerators(){
+        /**
+         * Case one
+         */
+        getUsers().stream()
+                .forEach(u -> {
+                    u.setModerador(true);
+                    System.out.println(u);
+                });
+
+        /**
+         * Legible case
+         */
+        getUsers().stream().forEach(User::toModerator);
+    }
+
+    @Test
+    public void composingComparators(){
+        getUsers()
+                .stream()
+                .sorted(Comparator
+                        .comparingInt(User::getPontos)
+                        .thenComparing(User::getNome))
+                .forEach(System.out::println);
+    }
+
+    @Test
+    public void reversingComparators(){
+        getUsers()
+                .stream()
+                .sorted(Comparator
+                        .comparingInt(User::getPontos)
+                        .thenComparing(User::getNome)
+                        .reversed())
+                .forEach(System.out::println);
+    }
+
+    @Test
+    public void lambdaConstructing(){
+        BiFunction<String, Integer, User>  userCreator = User::new;
+        User felipe = userCreator.apply("Felipe", 12);
+        User matheus = userCreator.apply("Matheus", 12);
+    }
+
+    private static List<User> getUsers(){
+        return new ArrayList<User>(DataPreLoaded.users);
     }
 
 }

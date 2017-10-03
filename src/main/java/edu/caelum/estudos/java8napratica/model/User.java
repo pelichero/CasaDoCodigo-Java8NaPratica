@@ -3,10 +3,15 @@ package edu.caelum.estudos.java8napratica.model;
 public class User {
 
     private String nome;
-    private int pontos;
+    private Integer pontos;
     private boolean moderador;
 
-    public User(String nome, int pontos, boolean moderador) {
+    public User(String nome, Integer pontos) {
+        this.nome = nome;
+        this.pontos = pontos;
+    }
+
+    public User(String nome, Integer pontos, boolean moderador) {
         this.nome = nome;
         this.pontos = pontos;
         this.moderador = moderador;
@@ -20,11 +25,11 @@ public class User {
         this.nome = nome;
     }
 
-    public int getPontos() {
+    public Integer getPontos() {
         return pontos;
     }
 
-    public void setPontos(int pontos) {
+    public void setPontos(Integer pontos) {
         this.pontos = pontos;
     }
 
@@ -34,6 +39,10 @@ public class User {
 
     public void setModerador(boolean moderador) {
         this.moderador = moderador;
+    }
+
+    public void toModerator(){
+        this.setModerador(true);
     }
 
     @Override
