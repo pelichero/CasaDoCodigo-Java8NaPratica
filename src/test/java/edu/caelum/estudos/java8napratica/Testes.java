@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Testes {
 
@@ -158,6 +159,37 @@ public class Testes {
         BiFunction<String, Integer, User>  userCreator = User::new;
         User felipe = userCreator.apply("Felipe", 12);
         User matheus = userCreator.apply("Matheus", 12);
+    }
+
+    @Test
+    public void moderadoresComMaisPontos(){
+        List<User> users = getUsers();
+
+        users.sort(Comparator.comparing(User::getPontos));
+
+        users
+            .subList(0, 10)
+                        .forEach(u -> {
+                            u.toModerator();
+                            System.out.println(u);
+                        });
+    }
+
+    @Test
+    public void moderadoresComMaisDe100(){
+        getUsers().stream().filter(u -> u.getPontos() > 100).collect(Collectors.toList()).forEach(System.out::println);
+    }
+
+    @Test
+    public void listandoApenasPontos(){
+        getUsers().stream().map(User::getPontos).forEach(System.out::println);
+    }
+
+    @Test
+    public void streamsPrimitivas(){
+        IntStream intStream =  getUsers().stream().mapToInt(User::getPontos);
+        System.out.println(intStream.count());
+        System.out.println(intStream.average());
     }
 
     private static List<User> getUsers(){
