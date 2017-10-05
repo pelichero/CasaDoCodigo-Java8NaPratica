@@ -10,7 +10,7 @@ public class DataPreLoaded {
             new User("Karina",  1, false),
             new User("Mel",     2, false),
             new User("Latiff",  4, false),
-            new User("João",    10, true),
+            new User("João",    10000, true),
             new User("Roberto", 7, false),
             new User("Alberto", 9, false),
             new User("Renato",  4, false),

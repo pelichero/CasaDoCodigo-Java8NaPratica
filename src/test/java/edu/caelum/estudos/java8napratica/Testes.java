@@ -6,9 +6,7 @@ import edu.caelum.estudos.java8napratica.model.DataPreLoaded;
 import edu.caelum.estudos.java8napratica.model.User;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -187,10 +185,60 @@ public class Testes {
 
     @Test
     public void streamsPrimitivas(){
-        IntStream intStream =  getUsers().stream().mapToInt(User::getPontos);
-        System.out.println(intStream.count());
-        System.out.println(intStream.average());
+        System.out.println(getUsers().stream().mapToInt(User::getPontos).count());
+
+        System.out.println(getUsers().stream().mapToDouble(User::getPontos).average().getAsDouble());
+
+        OptionalDouble average = getUsers().stream().mapToDouble(User::getPontos).average();
+        System.out.println(average.orElse(0));
+
+        average.orElseThrow(IllegalAccessError::new);
     }
+
+    @Test
+    public void ordenandoEFiltrando(){
+        getUsers().stream()
+                        .filter(u -> u.getPontos() > 100)
+                        .sorted(Comparator.comparing(User::getNome))
+                        .forEach(System.out::println);
+    }
+
+    @Test
+    public void testStreamPipeline(){
+        getUsers().stream()
+                        .filter(u -> u.getPontos() > 100)
+                        .peek(System.out::println)
+                        .findAny();
+
+        getUsers().stream()
+                        .sorted(Comparator.comparing(User::getNome))
+                        .peek(System.out::println)
+                        .findAny();
+    }
+
+    @Test
+    public void testReduction(){
+        Optional<User> user = getUsers().stream().max(Comparator.comparing(User::getPontos));
+        System.out.println("Using max: "+user.get());
+
+        System.out.println("Using sum: "+ getUsers().stream().mapToInt(User::getPontos).sum());
+
+        System.out.println("Using reduce: "+ getUsers().stream().mapToInt(User::getPontos).reduce(0, (n1,n2) -> n1 + n2));
+    }
+
+    @Test
+    public void usingIteratorOnStream(){
+        getUsers().stream()
+                        .iterator()
+                        .forEachRemaining(System.out::println);
+    }
+
+    @Test
+    public void testingPredicates(){
+
+    }
+
+
 
     private static List<User> getUsers(){
         return new ArrayList<User>(DataPreLoaded.users);
