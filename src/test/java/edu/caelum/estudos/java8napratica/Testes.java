@@ -4,6 +4,7 @@ import edu.caelum.estudos.java8napratica.calculator.Fibonacci;
 import edu.caelum.estudos.java8napratica.consumers.Mostrador;
 import edu.caelum.estudos.java8napratica.functionalInterfaces.Validator;
 import edu.caelum.estudos.java8napratica.model.DataPreLoaded;
+import edu.caelum.estudos.java8napratica.model.Grupo;
 import edu.caelum.estudos.java8napratica.model.User;
 import org.junit.Test;
 
@@ -12,6 +13,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.acl.Group;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -308,6 +310,27 @@ public class Testes {
             ex.printStackTrace();
         }
     }
+
+    @Test
+    public void moreFlatMap(){
+        Grupo englishSpeakers = new Grupo();
+        englishSpeakers.add(getUsers().get(0));
+        englishSpeakers.add(getUsers().get(1));
+        englishSpeakers.add(getUsers().get(2));
+
+        Grupo spanishSpeakers = new Grupo();
+        spanishSpeakers.add(getUsers().get(3));
+        spanishSpeakers.add(getUsers().get(4));
+        spanishSpeakers.add(getUsers().get(5));
+
+        List<Grupo> grupos = Arrays.asList(englishSpeakers, spanishSpeakers);
+
+        grupos.stream()
+                        .flatMap(g -> g.getUsers().stream())
+                        .distinct()
+                        .forEach(System.out::println);
+    }
+
 
     private static Stream<String> lines(Path p){
         try{
