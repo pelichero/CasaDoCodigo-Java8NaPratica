@@ -1,11 +1,17 @@
 package edu.caelum.estudos.java8napratica;
 
+import edu.caelum.estudos.java8napratica.calculator.Fibonacci;
 import edu.caelum.estudos.java8napratica.consumers.Mostrador;
 import edu.caelum.estudos.java8napratica.functionalInterfaces.Validator;
 import edu.caelum.estudos.java8napratica.model.DataPreLoaded;
 import edu.caelum.estudos.java8napratica.model.User;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -13,6 +19,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Testes {
 
@@ -235,10 +242,80 @@ public class Testes {
 
     @Test
     public void testingPredicates(){
-
+        System.out.println(getUsers().stream() .anyMatch(User::isModerador));
     }
 
+    @Test
+    public void testBoxing(){
+        Random random = new Random();
+        IntStream stream = IntStream.generate(random::nextInt);
 
+        List<Integer> list = stream
+                            .limit(100)
+                            .boxed()
+                            .collect(Collectors.toList());
+
+        list.forEach(System.out::println);
+    }
+
+    @Test
+    public void testFibonacci(){
+        Integer num = IntStream
+                        .generate(new Fibonacci())
+                        .filter(f -> f > 10)
+                        .findFirst()
+                        .getAsInt();
+
+        System.out.println(num);
+    }
+
+    @Test
+    public void testCircuitEnd(){
+        IntStream.iterate(0, x -> x + 1).limit(10).forEach(System.out::println);
+    }
+
+    @Test
+    public void testNio(){
+        try {
+            Files.list(Paths.get("/home/fpelichero/Downloads/OneDrive-2017-09-21"))
+                            .filter(p -> p.toString().endsWith(".pdf"))
+                            .forEach(System.out::println);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCapsulingOwnMethods(){
+        try {
+            Files.list(Paths.get("/home/fpelichero/Downloads"))
+                            .filter(p -> p.toString().endsWith(".txt"))
+                            .map(p -> lines(p))
+                            .forEach(System.out::println);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testFlatMap(){
+        try{
+            Files.list(Paths.get("/home/fpelichero/Downloads"))
+                            .filter(p -> p.toString().endsWith(".txt"))
+                            .flatMap(Testes::lines)
+                            .forEach(System.out::println);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private static Stream<String> lines(Path p){
+        try{
+            return Files.lines(p);
+        }catch (IOException ex){
+            throw new UncheckedIOException(ex);
+        }
+    }
 
     private static List<User> getUsers(){
         return new ArrayList<User>(DataPreLoaded.users);
